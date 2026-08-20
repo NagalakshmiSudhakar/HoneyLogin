@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Honeypot Dashboard</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<style>
+#map { height: 550px; width: 100%; }
+table { width: 100%; border-collapse: collapse; }
+th, td { border: 1px solid #777; padding: 4px; }
+</style>
+</head>
+<body>
+<h2>Attacker Activity Dashboard</h2>
+<div id="map"></div>
+<br>
+
+<table>
+<tr>
+<th>Timestamp</th><th>IP</th><th>Port</th><th>Country</th><th>City</th><th>Username</th><th>Password</th><th>User-Agent</th>
+</tr>
+{% for e in entries %}
+<tr>
+<td>{{ e[0] }}</td>
+<td>{{ e[1] }}</td>
+<td>{{ e[2] }}</td>
+<td>{{ e[5] }}</td>
+<td>{{ e[6] }}</td>
+<td>{{ e[7] }}</td>
+<td>{{ e[8] }}</td>
+<td>{{ e[9] }}</td>
+</tr>
+{% endfor %}
+</table>
+
+<script>
+var map = L.map('map').setView([20, 0], 2);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+{% for e in entries %}
+var lat = parseFloat("{{ e[3] }}");
+var lon = parseFloat("{{ e[4] }}");
+if (!isNaN(lat) && !isNaN(lon)) {
+    L.circleMarker([lat, lon], {
+        radius: 7,
+        color: "red"
+    }).addTo(map).bindPopup(`
+        <b>IP:</b> {{ e[1] }}<br>
+        <b>Country:</b> {{ e[5] }}<br>
+        <b>City:</b> {{ e[6] }}<br>
+        <b>Port:</b> {{ e[2] }}<br>
+        <b>Username:</b> {{ e[7] }}
+    `);
+}
+{% endfor %}
+</script>
+</body>
+</html>
